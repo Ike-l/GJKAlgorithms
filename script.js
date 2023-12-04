@@ -102,6 +102,9 @@ class Simplex {
         this.D[2] = d[2]
     }
 }
+const equalsCheck = (a, b) => {
+    return JSON.stringify(a) === JSON.stringify(b);
+}
 
 // Support
 function sameDirection(vec1, vec2) {
@@ -121,7 +124,7 @@ function getSupport(vertices, direction) {
     return largestVertex
 }
 // Simplex
-function solveSimplexLine(simplex, direction) {
+function solveSimplexLine(simplex) {
     const ab = vec3.create()
     const ao = vec3.create()
 
@@ -256,8 +259,7 @@ function solveSimpleGJK(v1, v2) {
     simplex.a = aTemp
     vec3.subtract(direction, vec3.create(), simplex.a)
     let __Count = 0
-    let flag = true
-    while (flag) {
+    while (true) {
         __Count++
         if (__Count % 2500 == 0) {
             break
@@ -427,14 +429,14 @@ const TestMeshes = TestCases.map((test) => {
     const B = new Cube(test[1])
     return [A, B]
 })
-
+console.log(TestCases.length)
 
 const iterations = 1e5
 const startTime = performance.now()
 for (let i = 0; i < iterations; i++) {
     const results = TestCases.map((test, index) => {
         const result = test[2] === solveSimpleGJK(TestMeshes[index][0].WorldPositions, TestMeshes[index][1].WorldPositions)
-        return result
+        return result || equalsCheck(TestCases[index][0], TestCases[index][1])
     })
     if (0 === i) {
         const bool = results.includes(false)
